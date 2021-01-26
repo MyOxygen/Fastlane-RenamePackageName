@@ -1,5 +1,5 @@
 require 'fastlane/action'
-require_relative '../helper/rename_package_name_helper'
+require_relative '../helper/android_helper'
 
 module Fastlane
   module Actions
