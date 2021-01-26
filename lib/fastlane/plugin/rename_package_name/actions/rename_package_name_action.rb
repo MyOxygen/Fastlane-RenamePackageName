@@ -5,11 +5,41 @@ module Fastlane
   module Actions
     class RenamePackageNameAction < Action
       def self.run(params)
-        UI.message("The rename_package_name plugin is working!")
+        platform = params[:platform]
+        project_home_path = params[:project_home_path]
+        new_package_name = params[:new_package_name]
+        profiles = params[:profiles]
+        language = params[:language]
+
+        puts "Parameters received:"
+        puts "Platform: " + platform
+        puts "Project home path: " + project_home_path
+        puts "New package name: " + new_package_name
+        puts "Profiles: " + profiles.join(", ")
+        puts "Language: " + language
+
+        if platform != nil
+          platform = platform.downcase
+          if platform == "ios"
+            puts "I am on iOS!"
+          elsif platform == "android"
+            print_datetime_now()
+            Nonsense.rename_package_names(project_home_path, new_package_name, profiles, language)
+          end
+        end
+      end
+
+      def self.print_datetime_now()
+        # loading library 
+        require 'date'
+        # declaring DateTime value 
+        date_a = DateTime.now() 
+        #  now method 
+        puts "DateTime now: #{date_a}\n\n"
       end
 
       def self.description
-        "A shorthand way of renaming the package name (App ID / Bundle ID) of an app in Fastlane."
+        "A shorthand way of renaming the package name (App ID / Bundle ID) of an app in Fastlane"
       end
 
       def self.authors
@@ -27,11 +57,31 @@ module Fastlane
 
       def self.available_options
         [
-          # FastlaneCore::ConfigItem.new(key: :your_option,
-          #                         env_name: "RENAME_PACKAGE_NAME_YOUR_OPTION",
-          #                      description: "A description of your option",
-          #                         optional: false,
-          #                             type: String)
+          FastlaneCore::ConfigItem.new(key: :project_home_path,
+                                  env_name: "RENAME_PACKAGE_NAME_PROJECT_HOME_PATH",
+                               description: "The home path of the project to which this code will execute in",
+                                  optional: false,
+                                      type: String),
+          FastlaneCore::ConfigItem.new(key: :new_package_name,
+                                  env_name: "RENAME_PACKAGE_NAME_NEW_PACKAGE_NAME",
+                               description: "The package name to which to change to",
+                                  optional: false,
+                                      type: String),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                  env_name: "RENAME_PACKAGE_NAME_PLATFORM",
+                               description: "The platform for which this code will execute in (android/ios)",
+                                  optional: false,
+                                      type: String),
+          FastlaneCore::ConfigItem.new(key: :profiles,
+                                  env_name: "RENAME_PACKAGE_NAME_PROFILES",
+                                description: "The list of profiles necessary to run on (Android only), and takes an array of Strings",
+                                  optional: true,
+                                      type: Array),
+          FastlaneCore::ConfigItem.new(key: :language,
+                                  env_name: "RENAME_PACKAGE_NAME_LANGUAGE",
+                                description: "The native language used to write the native code (Android only)",
+                                  optional: true,
+                                      type: String)
         ]
       end
 
@@ -40,7 +90,7 @@ module Fastlane
         # See: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
         #
         # [:ios, :mac, :android].include?(platform)
-        true
+        [:ios, :android].include?(platform)
       end
     end
   end
