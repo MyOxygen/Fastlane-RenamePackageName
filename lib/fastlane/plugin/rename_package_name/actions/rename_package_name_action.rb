@@ -23,19 +23,9 @@ module Fastlane
           if platform == "ios"
             puts "I am on iOS!"
           elsif platform == "android"
-            print_datetime_now()
             Android.rename_package_names(project_home_path, new_package_name, profiles, language)
           end
         end
-      end
-
-      def self.print_datetime_now()
-        # loading library 
-        require 'date'
-        # declaring DateTime value 
-        date_a = DateTime.now() 
-        #  now method 
-        puts "DateTime now: #{date_a}\n\n"
       end
 
       def self.description
