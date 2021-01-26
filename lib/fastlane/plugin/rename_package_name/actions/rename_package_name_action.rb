@@ -24,7 +24,7 @@ module Fastlane
             puts "I am on iOS!"
           elsif platform == "android"
             print_datetime_now()
-            Nonsense.rename_package_names(project_home_path, new_package_name, profiles, language)
+            Android.rename_package_names(project_home_path, new_package_name, profiles, language)
           end
         end
       end
