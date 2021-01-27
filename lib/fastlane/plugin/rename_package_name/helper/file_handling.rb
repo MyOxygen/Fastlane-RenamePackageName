@@ -45,10 +45,10 @@ class FileHandling
                 index_of_quote = attribute_removed =~ /\"/
 
                 package_name = attribute_removed[0, index_of_quote]
-                break 
+                break
             end
         end
-        
+
         return package_name
     end
 

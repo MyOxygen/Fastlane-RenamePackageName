@@ -83,11 +83,11 @@ module Fastlane
 
       def self.details
         # Optional:
-        "The plugin goes through both Android and iOS, and replaces the App ID (Android) " +
-        "and Bundle ID (iOS) with a new name. For Android, it also goes through the native " +
-        "files and folders, renaming the package reference, the applicationId in the gradle, " +
-        "the package attribute in the manifest, and moves the files into thee new folder structure " +
-        "(as per the new package name)."
+        "The plugin goes through both Android and iOS, and replaces the App ID (Android) " \
+          "and Bundle ID (iOS) with a new name. For Android, it also goes through the native " \
+          "files and folders, renaming the package reference, the applicationId in the gradle, " \
+          "the package attribute in the manifest, and moves the files into thee new folder structure " \
+          "(as per the new package name)."
       end
 
       def self.available_options
