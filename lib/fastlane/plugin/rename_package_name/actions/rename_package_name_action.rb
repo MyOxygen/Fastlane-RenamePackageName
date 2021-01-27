@@ -31,7 +31,10 @@ module Fastlane
           end
 
           # Required values are not empty, so we can carry out the renaming.
-          update_app_identifier(
+          # When calling an external action, use the action's class name.
+          # Class name - https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/update_app_identifier.rb
+          # Suggestion from - https://github.com/fastlane/fastlane/issues/826
+          Fastlane::Actions::UpdateAppIdentifierAction.run(
             xcodeproj: xcodeproj,
             plist_path: plist_path,
             app_identifier: new_package_name
