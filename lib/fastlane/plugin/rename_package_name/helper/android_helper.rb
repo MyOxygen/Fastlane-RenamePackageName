@@ -1,9 +1,10 @@
 require_relative "./file_handling.rb"
+require_relative "./generic_helper.rb"
 
 class Android
-    def self.rename_package_names(project_home_path, new_package_name, profiles, language="java")
+    def self.rename_package_names(project_home_path, new_package_name, profiles, language = "java")
         # First check the parameters
-        if project_home_path == nil || project_home_path == "" || project_home_path.strip! != nil
+        if GenericHelper.is_nil_or_whitespace(project_home_path)
             FastlaneCore::UI.user_error!("Invalid project home path: [" + project_home_path + "]")
             return
         end
@@ -16,17 +17,17 @@ class Android
         fastlane_directory = path + "fastlane/"
         source_directory = gradle_directory + "src/"
 
-        if new_package_name == nil || new_package_name == "" || new_package_name.strip! != nil
+        if GenericHelper.is_nil_or_whitespace(new_package_name)
             FastlaneCore::UI.user_error!("Invalid package name: [" + new_package_name + "]")
             return
         end
 
-        if profiles == nil || profiles.length == 0
+        if GenericHelper.is_nil_or_empty(profiles)
             FastlaneCore::UI.user_error!("Invalid profiles")
             return
         end
 
-        if language == nil || (language.downcase != "java" && language.downcase != "kotlin")
+        if GenericHelper.is_nil_or_whitespace(language) || (language.downcase != "java" && language.downcase != "kotlin")
             FastlaneCore::UI.user_error!("Invalid programming language: [" + language + "]")
             return
         end

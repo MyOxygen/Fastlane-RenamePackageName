@@ -1,11 +1,12 @@
 require 'fastlane/action'
 require_relative '../helper/android_helper'
+require_relative '../helper/generic_helper'
 
 module Fastlane
   module Actions
     class RenamePackageNameAction < Action
       def self.run(params)
-        if is_nil_or_empty(params)
+        if GenericHelper.is_nil_or_empty(params)
           UI.user_error!("`rename_package_name` must have parameters")
           return
         end
@@ -13,10 +14,10 @@ module Fastlane
         platform = params[:platform]
         new_package_name = params[:new_package_name]
 
-        if is_nil_or_whitespace(new_package_name)
+        if GenericHelper.is_nil_or_whitespace(new_package_name)
           UI.user_error!("The new package name must not be empty")
           return
-        elsif is_nil_or_whitespace(platform)
+        elsif GenericHelper.is_nil_or_whitespace(platform)
           UI.user_error!("The platform must be specified")
           return
         end
@@ -31,10 +32,10 @@ module Fastlane
           plist_path = params[:plist_path]
 
           # Both the Xcode project file and the Info.plist file are required.
-          if is_nil_or_whitespace(xcodeproj)
+          if GenericHelper.is_nil_or_whitespace(xcodeproj)
             UI.user_error!("The Xcode Project path must not be empty")
             return
-          elsif is_nil_or_whitespace(plist_path)
+          elsif GenericHelper.is_nil_or_whitespace(plist_path)
             UI.user_error!("The Info.plist path must not be empty")
             return
           end
@@ -56,9 +57,9 @@ module Fastlane
           profiles = params[:profiles]
           language = params[:language]
 
-          # The project home path is required, but the profiles and the 
+          # The project home path is required, but the profiles and the
           # language used are optional. These are defaulted.
-          if is_nil_or_whitespace(project_home_path)
+          if GenericHelper.is_nil_or_whitespace(project_home_path)
             UI.user_error!("The project home path must not be empty")
             return
           end
@@ -82,7 +83,11 @@ module Fastlane
 
       def self.details
         # Optional:
-        "The plugin goes through both Android and iOS, and replaces the App ID (Android) and Bundle ID (iOS) with a new name. For Android, it also goes through the native files and folders, renaming the package reference, the applicationId in the gradle, the package attribute in the manifest, and moves the files into thee new folder structure (as per the new package name)."
+        "The plugin goes through both Android and iOS, and replaces the App ID (Android) " +
+        "and Bundle ID (iOS) with a new name. For Android, it also goes through the native " +
+        "files and folders, renaming the package reference, the applicationId in the gradle, " +
+        "the package attribute in the manifest, and moves the files into thee new folder structure " +
+        "(as per the new package name)."
       end
 
       def self.available_options
@@ -133,14 +138,6 @@ module Fastlane
         #
         # [:ios, :mac, :android].include?(platform)
         [:ios, :android].include?(platform)
-      end
-
-      def self.is_nil_or_whitespace(string)
-        return string == nil || string == "" || string.strip! != nil
-      end
-
-      def self.is_nil_or_empty(array)
-        return array == nil || array.length == 0
       end
     end
   end
