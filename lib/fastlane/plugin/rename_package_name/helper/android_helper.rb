@@ -5,6 +5,7 @@ class Android
         # First check the parameters
         if project_home_path == nil || project_home_path == "" || project_home_path.strip! != nil
             FastlaneCore::UI.user_error!("Invalid project home path: [" + project_home_path + "]")
+            return
         end
 
         path = project_home_path
@@ -17,14 +18,17 @@ class Android
 
         if new_package_name == nil || new_package_name == "" || new_package_name.strip! != nil
             FastlaneCore::UI.user_error!("Invalid package name: [" + new_package_name + "]")
+            return
         end
 
         if profiles == nil || profiles.length == 0
             FastlaneCore::UI.user_error!("Invalid profiles")
+            return
         end
 
         if language == nil || (language.downcase != "java" && language.downcase != "kotlin")
             FastlaneCore::UI.user_error!("Invalid programming language: [" + language + "]")
+            return
         end
 
         code_path = source_directory + "main/" + language.downcase + "/"

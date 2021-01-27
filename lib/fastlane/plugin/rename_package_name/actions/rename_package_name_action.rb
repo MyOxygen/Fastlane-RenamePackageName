@@ -5,13 +5,20 @@ module Fastlane
   module Actions
     class RenamePackageNameAction < Action
       def self.run(params)
+        if is_nil_or_empty(params)
+          UI.user_error!("`rename_package_name` must have parameters")
+          return
+        end
+
         platform = params[:platform]
         new_package_name = params[:new_package_name]
 
         if is_nil_or_whitespace(new_package_name)
           UI.user_error!("The new package name must not be empty")
+          return
         elsif is_nil_or_whitespace(platform)
           UI.user_error!("The platform must be specified")
+          return
         end
 
         platform = platform.downcase
@@ -26,8 +33,10 @@ module Fastlane
           # Both the Xcode project file and the Info.plist file are required.
           if is_nil_or_whitespace(xcodeproj)
             UI.user_error!("The Xcode Project path must not be empty")
+            return
           elsif is_nil_or_whitespace(plist_path)
             UI.user_error!("The Info.plist path must not be empty")
+            return
           end
 
           # Required values are not empty, so we can carry out the renaming.
@@ -51,6 +60,7 @@ module Fastlane
           # language used are optional. These are defaulted.
           if is_nil_or_whitespace(project_home_path)
             UI.user_error!("The project home path must not be empty")
+            return
           end
 
           # Required values are not empty, so we can carry out the renaming.
