@@ -6,55 +6,52 @@ module Fastlane
     class RenamePackageNameAction < Action
       def self.run(params)
         platform = params[:platform]
-        project_home_path = params[:android_project_home_path]
         new_package_name = params[:new_package_name]
-        profiles = params[:profiles]
-        language = params[:language]
 
-        puts "Parameters received:"
-        puts "Platform: " + platform
-        puts "Project home path: " + project_home_path
-        puts "New package name: " + new_package_name
-        puts "Profiles: " + profiles.join(", ")
-        puts "Language: " + language
+        if is_nil_or_whitespace(new_package_name)
+          UI.user_error!("The new package name must not be empty")
+        elsif is_nil_or_whitespace(platform)
+          UI.user_error!("The platform must be specified")
+        end
 
-        if platform != nil
-          platform = platform.downcase
-          if platform == "ios"
-            puts "I am on iOS!"
-            # TODO: Either use the `update_app_identifier` (https://docs.fastlane.tools/actions/update_app_identifier/)
-            # or just change the PRODUCT_BUNDLE_IDENTIFIER in the project 
-            # file (.pbxproj)
-            # Just the the already available package. It's integrated as part 
-            # of the Fastlane framework, so it should be good to use here.
+        platform = platform.downcase
+        if platform == "ios"
+          # For iOS, we need the xcodeproj and plist_path. We will be using
+          # the existing package provided by Fastlane: `update_app_identifier`
+          # (https://docs.fastlane.tools/actions/update_app_identifier/).
 
-            # We need the xcodeproj, the package name, and plist_path.
+          xcodeproj = params[:xcodeproj]
+          plist_path = params[:plist_path]
 
-            xcodeproj = params[:xcodeproj]
-            plist_path = params[:plist_path]
-
-            if is_nil_or_whitespace(xcodeproj)
-              UI.user_error!("The Xcode Project path must not be empty")
-            elsif is_nil_or_whitespace(plist_path)
-              UI.user_error!("The Info.plist path must not be empty")
-            end
-
-          elsif platform == "android"
-            # For Android, we need the project home path, the profiles, and the
-            # language used.
-            project_home_path = params[:android_project_home_path]
-            profiles = params[:profiles]
-            language = params[:language]
-
-            # The project home path is required, but the profiles and the 
-            # language used are optional. These are defaulted.
-            if is_nil_or_whitespace(project_home_path)
-              UI.user_error!("The project home path must not be empty")
-            end
-
-            # Required values are not empty, so we can carry out the renaming.
-            Android.rename_package_names(project_home_path, new_package_name, profiles, language)
+          # Both the Xcode project file and the Info.plist file are required.
+          if is_nil_or_whitespace(xcodeproj)
+            UI.user_error!("The Xcode Project path must not be empty")
+          elsif is_nil_or_whitespace(plist_path)
+            UI.user_error!("The Info.plist path must not be empty")
           end
+
+          # Required values are not empty, so we can carry out the renaming.
+          update_app_identifier(
+            xcodeproj: xcodeproj,
+            plist_path: plist_path,
+            app_identifier: new_package_name
+          )
+
+        elsif platform == "android"
+          # For Android, we need the project home path, the profiles, and the
+          # language used.
+          project_home_path = params[:android_project_home_path]
+          profiles = params[:profiles]
+          language = params[:language]
+
+          # The project home path is required, but the profiles and the 
+          # language used are optional. These are defaulted.
+          if is_nil_or_whitespace(project_home_path)
+            UI.user_error!("The project home path must not be empty")
+          end
+
+          # Required values are not empty, so we can carry out the renaming.
+          Android.rename_package_names(project_home_path, new_package_name, profiles, language)
         end
       end
 
