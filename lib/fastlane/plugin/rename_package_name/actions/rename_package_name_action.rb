@@ -6,7 +6,7 @@ module Fastlane
     class RenamePackageNameAction < Action
       def self.run(params)
         platform = params[:platform]
-        project_home_path = params[:project_home_path]
+        project_home_path = params[:android_project_home_path]
         new_package_name = params[:new_package_name]
         profiles = params[:profiles]
         language = params[:language]
@@ -22,7 +22,39 @@ module Fastlane
           platform = platform.downcase
           if platform == "ios"
             puts "I am on iOS!"
+            # TODO: Either use the `update_app_identifier` (https://docs.fastlane.tools/actions/update_app_identifier/)
+            # or just change the PRODUCT_BUNDLE_IDENTIFIER in the project 
+            # file (.pbxproj)
+            # Just the the already available package. It's integrated as part 
+            # of the Fastlane framework, so it should be good to use here.
+
+            # We need the xcodeproj, the package name, and plist_path.
+
+            xcodeproj = params[:xcodeproj]
+            plist_path = params[:plist_path]
+
+            if is_nil_or_whitespace(xcodeproj)
+              UI.user_error!("The Xcode Project path must not be empty")
+            elsif is_nil_or_whitespace(plist_path)
+              UI.user_error!("The Info.plist path must not be empty")
+            end
+
           elsif platform == "android"
+            # We need the project home path, the package name, the profiles,
+            # and the language used.
+            project_home_path = params[:android_project_home_path]
+            profiles = params[:profiles]
+            language = params[:language]
+
+            if is_nil_or_whitespace(project_home_path)
+              UI.user_error!("The project home path must not be empty")
+            elsif  is_nil_or_whitespace(language) 
+              UI.user_error!("The programming language used must not be empty")
+            elsif  is_nil_or_empty(profiles) 
+              UI.user_error!("The list of profiles in the project cannot be empty")
+            end
+
+            # Required values are not empty, so we can carry out the renaming.
             Android.rename_package_names(project_home_path, new_package_name, profiles, language)
           end
         end
@@ -47,11 +79,7 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :project_home_path,
-                                  env_name: "RENAME_PACKAGE_NAME_PROJECT_HOME_PATH",
-                               description: "The home path of the project to which this code will execute in",
-                                  optional: false,
-                                      type: String),
+          # Required parameters
           FastlaneCore::ConfigItem.new(key: :new_package_name,
                                   env_name: "RENAME_PACKAGE_NAME_NEW_PACKAGE_NAME",
                                description: "The package name to which to change to",
@@ -61,6 +89,22 @@ module Fastlane
                                   env_name: "RENAME_PACKAGE_NAME_PLATFORM",
                                description: "The platform for which this code will execute in (android/ios)",
                                   optional: false,
+                                      type: String),
+          # Optional parameters
+          FastlaneCore::ConfigItem.new(key: :android_project_home_path,
+                                  env_name: "RENAME_PACKAGE_NAME_ANDROID_PROJECT_HOME_PATH",
+                               description: "The home path of the project to which this code will execute in",
+                                  optional: true,
+                                      type: String),
+          FastlaneCore::ConfigItem.new(key: :xcodeproj,
+                                  env_name: "RENAME_PACKAGE_NAME_XCODEPROJ",
+                                description: "The Xcode project file which belongs to this project",
+                                  optional: true,
+                                      type: String),
+          FastlaneCore::ConfigItem.new(key: :plist_path,
+                                  env_name: "RENAME_PACKAGE_NAME_PLIST_PATH",
+                                description: "The path to info plist file, relative to xcodeproj",
+                                  optional: true,
                                       type: String),
           FastlaneCore::ConfigItem.new(key: :profiles,
                                   env_name: "RENAME_PACKAGE_NAME_PROFILES",
@@ -81,6 +125,14 @@ module Fastlane
         #
         # [:ios, :mac, :android].include?(platform)
         [:ios, :android].include?(platform)
+      end
+
+      def self.is_nil_or_whitespace(string)
+        return string == nil || string == "" || string.strip! != nil
+      end
+
+      def self.is_nil_or_empty(array)
+        return array == nil || array.length == 0
       end
     end
   end
