@@ -40,18 +40,16 @@ module Fastlane
             end
 
           elsif platform == "android"
-            # We need the project home path, the package name, the profiles,
-            # and the language used.
+            # For Android, we need the project home path, the profiles, and the
+            # language used.
             project_home_path = params[:android_project_home_path]
             profiles = params[:profiles]
             language = params[:language]
 
+            # The project home path is required, but the profiles and the 
+            # language used are optional. These are defaulted.
             if is_nil_or_whitespace(project_home_path)
               UI.user_error!("The project home path must not be empty")
-            elsif  is_nil_or_whitespace(language) 
-              UI.user_error!("The programming language used must not be empty")
-            elsif  is_nil_or_empty(profiles) 
-              UI.user_error!("The list of profiles in the project cannot be empty")
             end
 
             # Required values are not empty, so we can carry out the renaming.
