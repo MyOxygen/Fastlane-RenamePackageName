@@ -4,7 +4,7 @@ class Android
     def self.rename_package_names(project_home_path, new_package_name, profiles, language="java")
         # First check the parameters
         if project_home_path == nil || project_home_path == "" || project_home_path.strip! != nil
-            raise "Invalid project home path: [" + project_home_path + "]"
+            FastlaneCore::UI.user_error!("Invalid project home path: [" + project_home_path + "]")
         end
 
         path = project_home_path
@@ -16,15 +16,15 @@ class Android
         source_directory = gradle_directory + "src/"
 
         if new_package_name == nil || new_package_name == "" || new_package_name.strip! != nil
-            raise "Invalid package name: [" + new_package_name + "]"
+            FastlaneCore::UI.user_error!("Invalid package name: [" + new_package_name + "]")
         end
 
         if profiles == nil || profiles.length == 0
-            raise "Invalid profiles"
+            FastlaneCore::UI.user_error!("Invalid profiles")
         end
 
-        if language.downcase != "java" && language.downcase != "kotlin"
-            raise "Invalid programming language: [" + language + "]"
+        if language == nil || (language.downcase != "java" && language.downcase != "kotlin")
+            FastlaneCore::UI.user_error!("Invalid programming language: [" + language + "]")
         end
 
         code_path = source_directory + "main/" + language.downcase + "/"
@@ -86,8 +86,4 @@ class Android
             FileHandling.set_package_name_in_appfile(fastlane_directory, appfile_package_name, new_package_name)
         end
     end
-
-    # --------------------
-    # Private functions
-    # --------------------
 end
