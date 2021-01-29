@@ -1,10 +1,7 @@
 class FileHandling
   MANIFEST_FILE = "AndroidManifest.xml"
-  GRADLE_FILE = "AndroidManifest.xml"
+  GRADLE_FILE = "build.gradle"
   APP_FILE = "AppFile"
-  private_constant :MANIFEST_FILE
-  private_constant :GRADLE_FILE
-  private_constant :APP_FILE
 
   def self.get_package_name_from_manifest(directory)
     manifest_path = directory + MANIFEST_FILE
@@ -39,8 +36,25 @@ class FileHandling
     set_package_name_in_file(appfile_path, old_package_name, new_package_name)
   end
 
-  def self.get_package_name_from_file(file_path, attribute_regex, attribute_regex_length)
+  def self.get_package_name_from_java_codefile(codefile_path)
+    package_name = get_package_name_from_file(codefile_path, /package /, 8, ";")
+    return package_name
+  end
+
+  def self.get_package_name_from_kotlin_codefile(codefile_path)
+    package_name = get_package_name_from_file(codefile_path, /package /, 8, "\n")
+    return package_name
+  end
+
+  def self.get_package_name_from_file(file_path, attribute_regex, attribute_regex_length, attribute_end_char = "\"")
+    # Check file exists
+    if !File.exist?(file_path)
+      Fastlane::UI.user_error!("The provided path [#{file_path}] does not exist (current dir: [#{Dir.pwd}]")
+      return -1
+    end
+
     package_name = ""
+
     # Read/write file - https://www.rubyguides.com/2015/05/working-with-files-ruby/#How_to_Read_Files_In_Ruby
     File.foreach(file_path) do |line|
       # RegEx - http://rubylearning.com/satishtalim/ruby_regular_expressions.html
@@ -49,9 +63,9 @@ class FileHandling
       if index_of_package_attribute
         # Retrieve package name
         attribute_removed = line[index_of_package_attribute + attribute_regex_length, 1000] # Use large number for end of string
-        index_of_quote = attribute_removed =~ /\"/
+        partitioned_attribute = attribute_removed.split(attribute_end_char)
 
-        package_name = attribute_removed[0, index_of_quote]
+        package_name = partitioned_attribute[0]
         break
       end
     end
@@ -60,10 +74,18 @@ class FileHandling
   end
 
   def self.set_package_name_in_file(file_path, old_package_name, new_package_name)
+    if !File.exist?(file_path)
+      Fastlane::UI.user_error!("The provided path [#{file_path}] does not exist (current dir: [#{Dir.pwd}]")
+      return -1
+    end
+
     # Read/write file - https://www.rubyguides.com/2015/05/working-with-files-ruby/#How_to_Read_Files_In_Ruby
     file_data = File.read(file_path)
     # Replace package name
     new_file_data = file_data.gsub(old_package_name, new_package_name)
     File.write(file_path, new_file_data)
+
+    # Success
+    return 0
   end
 end

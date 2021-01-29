@@ -187,3 +187,10 @@ Style/MethodCallWithArgsParentheses:
   - context
   - before
   - after
+Style/NegatedIf:
+  Enabled: true
+  EnforcedStyle: postfix
+Layout/EmptyLinesAroundAccessModifier:
+  Exclude:
+  - "./spec/*"
+  

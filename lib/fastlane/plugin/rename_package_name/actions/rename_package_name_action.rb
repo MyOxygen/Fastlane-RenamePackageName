@@ -65,7 +65,10 @@ module Fastlane
           end
 
           # Required values are not empty, so we can carry out the renaming.
-          Android.rename_package_names(project_home_path, new_package_name, profiles, language)
+          AndroidHelper.rename_package_names(project_home_path, new_package_name, profiles, language)
+        else
+          UI.user_error!("Platform not supported")
+          return
         end
       end
 
