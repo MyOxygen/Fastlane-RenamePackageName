@@ -179,5 +179,15 @@ describe AndroidHelper do
       package_name = FileHandling.get_package_name_from_kotlin_codefile("#{KOTLIN_CODE_PATH}develop/#{KOTLIN_FILENAME}")
       expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
     end
+
+    it "Same files are not moved" do
+      AndroidHelper.move_code_files(SOURCE_DIRECTORY, "kotlin", RELEASE_PACKAGE_NAME, RELEASE_PACKAGE_NAME)
+      expect(Dir.exist?("#{KOTLIN_CODE_PATH}develop")).to eq(false)
+      expect(Dir.empty?(KOTLIN_CODE_PATH)).to eq(false)
+      expect(File.exist?("#{KOTLIN_CODE_PATH}#{KOTLIN_FILENAME}")).to eq(true)
+
+      package_name = FileHandling.get_package_name_from_kotlin_codefile("#{KOTLIN_CODE_PATH}/#{KOTLIN_FILENAME}")
+      expect(package_name).to eq(RELEASE_PACKAGE_NAME)
+    end
   end
 end

@@ -111,23 +111,25 @@ class AndroidHelper
     code_path = source_directory + "main/" + language.downcase + "/"
     code_directory_new = code_path + new_package_name.gsub(".", "/") + "/"
     code_directory_old = code_path + old_package_name.gsub(".", "/") + "/" # Use the package name obtained from previous step
-    if !Dir.exist?(code_directory_new) || Dir.empty?(code_directory_new)
-      # Create the new folder if it doesn't already exist.
-      FileUtils.mkdir_p(code_directory_new)
 
-      # When moving files, assume the previous directory is that of the release
-      # package name structure.
-      Dir.entries(code_directory_old).each do |file|
-        file_path = code_directory_old + file
-        if file == "." || file == ".." || !File.exist?(file_path) || File.directory?(file_path)
-          next
-        end
+    # Create the new folder if it doesn't already exist.
+    FileUtils.mkdir_p(code_directory_new)
 
-        # TODO: Apply moving files to nested folders and code files.
+    # When moving files, assume the previous directory is that of the release
+    # package name structure.
+    Dir.entries(code_directory_old).each do |file|
+      file_path = code_directory_old + file
+      if file == "." || file == ".." || !File.exist?(file_path) || File.directory?(file_path)
+        next
+      end
 
-        # Update the package reference to the new name
-        rename_package_in_code_file(file_path, old_package_name, new_package_name)
+      # TODO: Apply moving files to nested folders and code files.
 
+      # Update the package reference to the new name
+      rename_package_in_code_file(file_path, old_package_name, new_package_name)
+
+      # Only move files if their paths differ.
+      if !File.identical?(file_path, code_directory_new + file)
         # Move files - https://ruby-doc.org/stdlib-2.4.1/libdoc/fileutils/rdoc/FileUtils.html#method-c-mv
         FileUtils.mv(file_path, code_directory_new + file, force: true)
       end
