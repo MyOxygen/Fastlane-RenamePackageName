@@ -6,7 +6,12 @@ module Fastlane
   module Actions
     class RenamePackageNameAction < Action
       def self.run(params)
-        if GenericHelper.is_nil_or_empty(params)
+        # Check there are incoming parameters. Note that the parameters are not
+        # in an array, but a FastlaneCore::Configuration object. Whilst this
+        # object does have an array of parameters, we will need to first check
+        # that such an object has been passed to obtain the parameters. We can
+        # check the validity of contents later.
+        if params.nil?
           UI.user_error!("`rename_package_name` must have parameters")
           return
         end
