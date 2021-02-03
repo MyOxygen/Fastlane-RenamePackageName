@@ -38,6 +38,12 @@ class AndroidHelper
     old_package_name = FileHandling.get_package_name_from_manifest(source_directory + profiles[0] + "/")
     if old_package_name == -1
       return -1
+    elsif old_package_name == new_package_name
+      # If the package names are the same, there's no point in wasting time
+      # conducting this operation. Warn the user, and exit early.
+      Fastlane::UI.important("The old package name in the AndroidManifest is the same as the desired new package name")
+      Fastlane::UI.important("Skipping package renaming")
+      return -1
     end
     status = update_manifests(source_directory, profiles, new_package_name)
     if status == -1
