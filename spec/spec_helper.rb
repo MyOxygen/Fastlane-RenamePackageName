@@ -11,8 +11,12 @@ module SpecHelper
   DYNAMIC_FILES = "./spec/test_files/dynamic_files/"
   RELEASE_PACKAGE_NAME = "com.example.app"
   DEVELOP_PACKAGE_NAME = "com.example.app.develop"
-  VALID_PATH_WITH_FILES = "./spec/test_files/android_src/"
-  SOURCE_DIRECTORY = "#{VALID_PATH_WITH_FILES}app/src/"
+  VALID_PATH_WITH_FILES = "./spec/test_files/"
+  ANDROID_PROJECT_PATH = "#{VALID_PATH_WITH_FILES}android_src/"
+  IOS_PROJECT_PATH = "#{VALID_PATH_WITH_FILES}ios_src/"
+  FASTLANE_ANDROID_DIRECTORY = "#{ANDROID_PROJECT_PATH}fastlane/"
+  FASTLANE_IOS_DIRECTORY = "#{IOS_PROJECT_PATH}fastlane/"
+  SOURCE_DIRECTORY = "#{ANDROID_PROJECT_PATH}app/src/"
   JAVA_CODE_PATH = "#{SOURCE_DIRECTORY}main/java/com/example/app/"
   KOTLIN_CODE_PATH = "#{SOURCE_DIRECTORY}main/kotlin/com/example/app/"
   JAVA_FILENAME = "MainApplication.java"
@@ -31,7 +35,7 @@ module SpecHelper
     # build.gradle
     FileUtils.cp_r(
       STATIC_FILES + "build.gradle",
-      "#{VALID_PATH_WITH_FILES}app/",
+      "#{ANDROID_PROJECT_PATH}app/",
       remove_destination: true
     )
 
@@ -56,6 +60,25 @@ module SpecHelper
     FileUtils.cp_r(
       STATIC_FILES + JAVA_FILENAME,
       JAVA_CODE_PATH,
+      remove_destination: true
+    )
+
+    # Appfiles
+    FileUtils.cp_r(
+      STATIC_FILES + FileHandling::APP_FILE + "Android",
+      FASTLANE_ANDROID_DIRECTORY + FileHandling::APP_FILE,
+      remove_destination: true
+    )
+    FileUtils.cp_r(
+      STATIC_FILES + FileHandling::APP_FILE + "Ios",
+      FASTLANE_IOS_DIRECTORY + FileHandling::APP_FILE,
+      remove_destination: true
+    )
+
+    # Matchfile
+    FileUtils.cp_r(
+      STATIC_FILES + FileHandling::MATCH_FILE,
+      FASTLANE_IOS_DIRECTORY + FileHandling::MATCH_FILE,
       remove_destination: true
     )
   end

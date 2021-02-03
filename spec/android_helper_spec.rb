@@ -16,9 +16,9 @@ describe AndroidHelper do
   private
   VALID_PATH_NO_FILES = "./"
   private
-  VALID_PATH_WITH_FILES = "./spec/test_files/android_src/"
+  ANDROID_PROJECT_PATH = "./spec/test_files/android_src/"
   private
-  SOURCE_DIRECTORY = "#{VALID_PATH_WITH_FILES}app/src/"
+  SOURCE_DIRECTORY = "#{ANDROID_PROJECT_PATH}app/src/"
   private
   JAVA_CODE_PATH = "#{SOURCE_DIRECTORY}main/java/com/example/app/"
   private
@@ -66,7 +66,7 @@ describe AndroidHelper do
       INVALID_PACKAGE_NAMES.each do |invalid_package_name|
         expect(Fastlane::UI).to receive(:user_error!)
         AndroidHelper.rename_package_names(
-          VALID_PATH_WITH_FILES,
+          ANDROID_PROJECT_PATH,
           invalid_package_name,
           VALID_PROFILES
         )
@@ -77,7 +77,7 @@ describe AndroidHelper do
       INVALID_PROFILES.each do |invalid_profile_list|
         expect(Fastlane::UI).to receive(:user_error!)
         AndroidHelper.rename_package_names(
-          VALID_PATH_WITH_FILES,
+          ANDROID_PROJECT_PATH,
           VALID_PACKAGE_NAME,
           invalid_profile_list
         )
@@ -89,7 +89,7 @@ describe AndroidHelper do
       INVALID_PROFILES.each do |invalid_profile_list|
         expect(Fastlane::UI).to receive(:user_error!)
         AndroidHelper.rename_package_names(
-          VALID_PATH_WITH_FILES,
+          ANDROID_PROJECT_PATH,
           VALID_PACKAGE_NAME,
           invalid_profile_list
         )
@@ -110,20 +110,19 @@ describe AndroidHelper do
 
   context "Files update successfully" do
     it "AndroidManifest" do
-      manifest_directory = VALID_PATH_WITH_FILES + "app/src/"
       AndroidHelper.update_manifests(
-        manifest_directory,
+        SOURCE_DIRECTORY,
         VALID_PROFILES,
         DEVELOP_PACKAGE_NAME
       )
       VALID_PROFILES.each do |profile|
-        package_name = FileHandling.get_package_name_from_manifest(manifest_directory + "#{profile}/")
+        package_name = FileHandling.get_package_name_from_manifest(SOURCE_DIRECTORY + "#{profile}/")
         expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
       end
     end
 
     it "build.gradle" do
-      gradle_directory = VALID_PATH_WITH_FILES + "app/"
+      gradle_directory = ANDROID_PROJECT_PATH + "app/"
       AndroidHelper.update_gradle(
         gradle_directory,
         DEVELOP_PACKAGE_NAME
