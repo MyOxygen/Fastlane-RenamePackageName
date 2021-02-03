@@ -57,7 +57,10 @@ class AndroidHelper
     end
 
     # 4. Update the Appfile (part of the Fastlane package)
-    FileHandling.update_appfile(fastlane_directory, /package_name\("/), new_package_name)
+    status = FileHandling.update_appfile(fastlane_directory, FileHandling::APPFILE_ANDROID_ATTRIBUTE_REGEX, new_package_name)
+    if status == -1
+      return -1
+    end
   end
 
   def self.update_manifests(source_directory, profiles, new_package_name)

@@ -57,7 +57,10 @@ module Fastlane
           )
 
           # Update Fastlane-releated files (Matchfile is specific to iOS)
-          FileHandling.update_appfile(fastlane_directory, /app_identifier\("/, new_package_name)
+          status = FileHandling.update_appfile(fastlane_directory, FileHandling::APPFILE_IOS_ATTRIBUTE_REGEX, new_package_name)
+          if status == -1
+            return
+          end
           FileHandling.update_matchfile(fastlane_directory, new_package_name)
         elsif platform == "android"
           # For Android, we need the the profiles, and the language used.

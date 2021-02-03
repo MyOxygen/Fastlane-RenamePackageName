@@ -1,14 +1,25 @@
 class FileHandling
   MANIFEST_FILE = "AndroidManifest.xml"
   GRADLE_FILE = "build.gradle"
-  APP_FILE = "AppFile"
-  MATCH_FILE = "AppFile"
+  APP_FILE = "Appfile"
+  MATCH_FILE = "Matchfile"
+
+  MANIFEST_ATTRIBUTE_REGEX = /package=\"/
+  MANIFEST_ATTRIBUTE_LENGTH = 9
+  GRADLE_ATTRIBUTE_REGEX = /applicationId \"/
+  GRADLE_ATTRIBUTE_LENGTH = 15
+  APPFILE_ANDROID_ATTRIBUTE_REGEX = /package_name\(\"/
+  APPFILE_ANDROID_ATTRIBUTE_LENGTH = 14
+  APPFILE_IOS_ATTRIBUTE_REGEX = /app_identifier\(\"/
+  APPFILE_IOS_ATTRIBUTE_LENGTH = 16
+  MATCHFILE_ATTRIBUTE_REGEX = /app_identifier\(\[\"/
+  MATCHFILE_ATTRIBUTE_LENGTH = 17
 
   # AndroidManifest
 
   def self.get_package_name_from_manifest(directory)
     manifest_path = directory + MANIFEST_FILE
-    package_name = get_package_name_from_file(manifest_path, /package=\"/, 9)
+    package_name = get_package_name_from_file(manifest_path, MANIFEST_ATTRIBUTE_REGEX, MANIFEST_ATTRIBUTE_LENGTH)
     return package_name
   end
 
@@ -21,7 +32,7 @@ class FileHandling
 
   def self.get_package_name_from_gradle(directory)
     gradle_path = directory + GRADLE_FILE
-    package_name = get_package_name_from_file(gradle_path, /applicationId \"/, 15)
+    package_name = get_package_name_from_file(gradle_path, GRADLE_ATTRIBUTE_REGEX, GRADLE_ATTRIBUTE_LENGTH)
     return package_name
   end
 
@@ -37,7 +48,16 @@ class FileHandling
     # file). Therefore, the attribute regex must be specified when doing
     # opertations for Android and iOS.
     appfile_path = directory + APP_FILE
-    package_name = get_package_name_from_file(appfile_path, attribute_regex, 14)
+    attribute_length = 0
+    if attribute_regex == APPFILE_ANDROID_ATTRIBUTE_REGEX
+      attribute_length = APPFILE_ANDROID_ATTRIBUTE_LENGTH
+    elsif attribute_regex == APPFILE_IOS_ATTRIBUTE_REGEX
+      attribute_length = APPFILE_IOS_ATTRIBUTE_LENGTH
+    else
+      Fastlane::UI.user_error!("Invalid Appfile attribute regex")
+      return -1
+    end
+    package_name = get_package_name_from_file(appfile_path, attribute_regex, attribute_length)
     return package_name
   end
 
@@ -48,7 +68,9 @@ class FileHandling
 
   def self.update_appfile(appfile_directory, attribute_regex, new_package_name)
     appfile_package_name = get_package_name_from_appfile(appfile_directory, attribute_regex)
-    if appfile_package_name != new_package_name
+    if appfile_package_name == -1
+      return -1
+    elsif appfile_package_name != new_package_name
       set_package_name_in_appfile(appfile_directory, appfile_package_name, new_package_name)
     end
   end
@@ -57,7 +79,7 @@ class FileHandling
 
   def self.get_package_name_from_matchfile(directory)
     matchfile_path = directory + MATCH_FILE
-    package_name = get_package_name_from_file(matchfile_path, /app_identifier\(\[\"/, 14)
+    package_name = get_package_name_from_file(matchfile_path, MATCHFILE_ATTRIBUTE_REGEX, MATCHFILE_ATTRIBUTE_LENGTH)
     return package_name
   end
 

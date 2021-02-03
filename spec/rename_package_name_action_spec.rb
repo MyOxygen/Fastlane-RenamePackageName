@@ -43,7 +43,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
         Fastlane::Actions::RenamePackageNameAction.run(
           new_package_name: VALID_PACKAGE_NAME,
           platform: "android",
-          android_project_home_path: invalid_parameter
+          project_home_path: invalid_parameter
         )
       end
 
@@ -53,7 +53,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
         Fastlane::Actions::RenamePackageNameAction.run(
           new_package_name: VALID_PACKAGE_NAME,
           platform: "android",
-          android_project_home_path: VALID_PATH,
+          project_home_path: VALID_PATH,
           language: invalid_parameter
         )
       end
@@ -64,7 +64,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
         Fastlane::Actions::RenamePackageNameAction.run(
           new_package_name: VALID_PACKAGE_NAME,
           platform: "android",
-          android_project_home_path: VALID_PATH,
+          project_home_path: VALID_PATH,
           language: "kotlin"
         )
       end
@@ -105,7 +105,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
       kotlin_filename = "MainActivity.kt"
 
       Fastlane::Actions::RenamePackageNameAction.run(
-        android_project_home_path: valid_path_with_files,
+        project_home_path: valid_path_with_files,
         new_package_name: develop_package_name,
         platform: "android",
         profiles: profiles,
@@ -137,7 +137,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
       java_filename = "MainApplication.java"
 
       Fastlane::Actions::RenamePackageNameAction.run(
-        android_project_home_path: valid_path_with_files,
+        project_home_path: valid_path_with_files,
         new_package_name: develop_package_name,
         platform: "android",
         profiles: profiles,
