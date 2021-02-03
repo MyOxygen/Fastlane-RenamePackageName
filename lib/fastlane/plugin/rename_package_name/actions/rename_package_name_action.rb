@@ -18,6 +18,7 @@ module Fastlane
 
         platform = params[:platform]
         new_package_name = params[:new_package_name]
+        project_home_path = params[:project_home_path]
 
         if GenericHelper.is_nil_or_whitespace(new_package_name)
           UI.user_error!("The new package name must not be empty")
@@ -55,10 +56,11 @@ module Fastlane
             app_identifier: new_package_name
           )
 
+          # Update Fastlane-releated files (Matchfile is specific to iOS)
+          FileHandling.update_appfile(fastlane_directory, /app_identifier\("/, new_package_name)
+          FileHandling.update_matchfile(fastlane_directory, new_package_name)
         elsif platform == "android"
-          # For Android, we need the project home path, the profiles, and the
-          # language used.
-          project_home_path = params[:android_project_home_path]
+          # For Android, we need the the profiles, and the language used.
           profiles = params[:profiles]
           language = params[:language]
 
@@ -111,12 +113,12 @@ module Fastlane
                                description: "The platform for which this code will execute in (android/ios)",
                                   optional: false,
                                       type: String),
-          # Optional parameters
-          FastlaneCore::ConfigItem.new(key: :android_project_home_path,
-                                  env_name: "RENAME_PACKAGE_NAME_ANDROID_PROJECT_HOME_PATH",
+          FastlaneCore::ConfigItem.new(key: :project_home_path,
+                                  env_name: "RENAME_PACKAGE_NAME_PROJECT_HOME_PATH",
                                description: "The home path of the project to which this code will execute in",
-                                  optional: true,
+                                  optional: false,
                                       type: String),
+          # Optional parameters
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                   env_name: "RENAME_PACKAGE_NAME_XCODEPROJ",
                                 description: "The Xcode project file which belongs to this project",

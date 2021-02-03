@@ -2,6 +2,9 @@ class FileHandling
   MANIFEST_FILE = "AndroidManifest.xml"
   GRADLE_FILE = "build.gradle"
   APP_FILE = "AppFile"
+  MATCH_FILE = "AppFile"
+
+  # AndroidManifest
 
   def self.get_package_name_from_manifest(directory)
     manifest_path = directory + MANIFEST_FILE
@@ -14,6 +17,8 @@ class FileHandling
     set_package_name_in_file(manifest_path, old_package_name, new_package_name)
   end
 
+  # gradle.build
+
   def self.get_package_name_from_gradle(directory)
     gradle_path = directory + GRADLE_FILE
     package_name = get_package_name_from_file(gradle_path, /applicationId \"/, 15)
@@ -25,9 +30,14 @@ class FileHandling
     set_package_name_in_file(gradle_path, old_package_name, new_package_name)
   end
 
-  def self.get_package_name_from_appfile(directory)
+  # Appfile
+
+  def self.get_package_name_from_appfile(directory, attribute_regex)
+    # The attribute is different between iOS and Android (even if it's the same
+    # file). Therefore, the attribute regex must be specified when doing
+    # opertations for Android and iOS.
     appfile_path = directory + APP_FILE
-    package_name = get_package_name_from_file(appfile_path, /package_name\(\"/, 14)
+    package_name = get_package_name_from_file(appfile_path, attribute_regex, 14)
     return package_name
   end
 
@@ -36,15 +46,48 @@ class FileHandling
     set_package_name_in_file(appfile_path, old_package_name, new_package_name)
   end
 
+  def self.update_appfile(appfile_directory, attribute_regex, new_package_name)
+    appfile_package_name = get_package_name_from_appfile(appfile_directory, attribute_regex)
+    if appfile_package_name != new_package_name
+      set_package_name_in_appfile(appfile_directory, appfile_package_name, new_package_name)
+    end
+  end
+
+  # Matchfile
+
+  def self.get_package_name_from_matchfile(directory)
+    matchfile_path = directory + MATCH_FILE
+    package_name = get_package_name_from_file(matchfile_path, /app_identifier\(\[\"/, 14)
+    return package_name
+  end
+
+  def self.set_package_name_in_matchfile(directory, old_package_name, new_package_name)
+    matchfile_path = directory + MATCH_FILE
+    set_package_name_in_file(matchfile_path, old_package_name, new_package_name)
+  end
+
+  def self.update_matchfile(matchfile_directory, new_package_name)
+    matchfile_package_name = get_package_name_from_matchfile(matchfile_directory)
+    if matchfile_package_name != new_package_name
+      set_package_name_in_matchfile(matchfile_directory, matchfile_package_name, new_package_name)
+    end
+  end
+
+  # Java code file
+
   def self.get_package_name_from_java_codefile(codefile_path)
     package_name = get_package_name_from_file(codefile_path, /package /, 8, ";")
     return package_name
   end
 
+  # Kotlin code file
+
   def self.get_package_name_from_kotlin_codefile(codefile_path)
     package_name = get_package_name_from_file(codefile_path, /package /, 8, "\n")
     return package_name
   end
+
+  # Generic
 
   def self.get_package_name_from_file(file_path, attribute_regex, attribute_regex_length, attribute_end_char = "\"")
     # Check file exists

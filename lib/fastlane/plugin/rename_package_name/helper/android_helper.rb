@@ -15,7 +15,7 @@ class AndroidHelper
     end
 
     gradle_directory = path + "app/"
-    # fastlane_directory = path + "fastlane/"
+    fastlane_directory = path + "fastlane/"
     source_directory = gradle_directory + "src/"
 
     if GenericHelper.is_nil_or_whitespace(new_package_name)
@@ -57,12 +57,7 @@ class AndroidHelper
     end
 
     # 4. Update the Appfile (part of the Fastlane package)
-    #    TODO? It depends if the package name in Fastlane actually makes a
-    #    difference to the package name in the release build.
-    # appfile_package_name = FileHandling.get_package_name_from_appfile(fastlane_directory)
-    # if appfile_package_name != new_package_name
-    #   FileHandling.set_package_name_in_appfile(fastlane_directory, appfile_package_name, new_package_name)
-    # end
+    FileHandling.update_appfile(fastlane_directory, /package_name\("/), new_package_name)
   end
 
   def self.update_manifests(source_directory, profiles, new_package_name)
