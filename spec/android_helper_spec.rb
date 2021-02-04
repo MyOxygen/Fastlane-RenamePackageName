@@ -109,18 +109,6 @@ describe AndroidHelper do
   end
 
   context "Files update successfully" do
-    it "AndroidManifest" do
-      AndroidHelper.update_manifests(
-        SOURCE_DIRECTORY,
-        VALID_PROFILES,
-        DEVELOP_PACKAGE_NAME
-      )
-      VALID_PROFILES.each do |profile|
-        package_name = FileHandling.get_package_name_from_manifest(SOURCE_DIRECTORY + "#{profile}/")
-        expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
-      end
-    end
-
     it "build.gradle" do
       gradle_directory = ANDROID_PROJECT_PATH + "app/"
       AndroidHelper.update_gradle(
@@ -158,35 +146,46 @@ describe AndroidHelper do
 
   context "Files moved successfully" do
     it "Java files" do
-      AndroidHelper.move_code_files(SOURCE_DIRECTORY, "java", RELEASE_PACKAGE_NAME, DEVELOP_PACKAGE_NAME)
-      expect(Dir.exist?("#{JAVA_CODE_PATH}develop")).to eq(true)
-      expect(Dir.empty?("#{JAVA_CODE_PATH}develop")).to eq(false)
+      java_develop_path = "#{JAVA_CODE_PATH}develop"
+      AndroidHelper.move_code_files(JAVA_CODE_PATH, java_develop_path)
+      expect(Dir.exist?(java_develop_path)).to eq(true)
+      expect(Dir.empty?(java_develop_path)).to eq(false)
       expect(File.exist?("#{JAVA_CODE_PATH}#{JAVA_FILENAME}")).to eq(false)
-      expect(File.exist?("#{JAVA_CODE_PATH}develop/#{JAVA_FILENAME}")).to eq(true)
+      expect(File.exist?("#{java_develop_path}/#{JAVA_FILENAME}")).to eq(true)
+    end
 
-      package_name = FileHandling.get_package_name_from_java_codefile("#{JAVA_CODE_PATH}develop/#{JAVA_FILENAME}")
+    it "Kotlin files" do
+      kotlin_develop_path = "#{KOTLIN_CODE_PATH}develop"
+      AndroidHelper.move_code_files(KOTLIN_CODE_PATH, kotlin_develop_path)
+      expect(Dir.exist?(kotlin_develop_path)).to eq(true)
+      expect(Dir.empty?(kotlin_develop_path)).to eq(false)
+      expect(File.exist?("#{KOTLIN_CODE_PATH}#{KOTLIN_FILENAME}")).to eq(false)
+      expect(File.exist?("#{kotlin_develop_path}/#{KOTLIN_FILENAME}")).to eq(true)
+    end
+
+    it "Same files are not moved" do
+      AndroidHelper.move_code_files(KOTLIN_CODE_PATH, KOTLIN_CODE_PATH)
+      expect(Dir.exist?("#{KOTLIN_CODE_PATH}develop")).to eq(false)
+      expect(Dir.empty?(KOTLIN_CODE_PATH)).to eq(false)
+      expect(File.exist?("#{KOTLIN_CODE_PATH}#{KOTLIN_FILENAME}")).to eq(true)
+    end
+  end
+
+  context "Files refactored successfully" do
+    it "Java files" do
+      AndroidHelper.refactor_code_files(JAVA_CODE_PATH, RELEASE_PACKAGE_NAME, DEVELOP_PACKAGE_NAME)
+      expect(File.exist?("#{JAVA_CODE_PATH}#{JAVA_FILENAME}")).to eq(true)
+
+      package_name = FileHandling.get_package_name_from_java_codefile("#{JAVA_CODE_PATH}/#{JAVA_FILENAME}")
       expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
     end
 
     it "Kotlin files" do
-      AndroidHelper.move_code_files(SOURCE_DIRECTORY, "kotlin", RELEASE_PACKAGE_NAME, DEVELOP_PACKAGE_NAME)
-      expect(Dir.exist?("#{KOTLIN_CODE_PATH}develop")).to eq(true)
-      expect(Dir.empty?("#{KOTLIN_CODE_PATH}develop")).to eq(false)
-      expect(File.exist?("#{KOTLIN_CODE_PATH}#{KOTLIN_FILENAME}")).to eq(false)
-      expect(File.exist?("#{KOTLIN_CODE_PATH}develop/#{KOTLIN_FILENAME}")).to eq(true)
-
-      package_name = FileHandling.get_package_name_from_kotlin_codefile("#{KOTLIN_CODE_PATH}develop/#{KOTLIN_FILENAME}")
-      expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
-    end
-
-    it "Same files are not moved" do
-      AndroidHelper.move_code_files(SOURCE_DIRECTORY, "kotlin", RELEASE_PACKAGE_NAME, RELEASE_PACKAGE_NAME)
-      expect(Dir.exist?("#{KOTLIN_CODE_PATH}develop")).to eq(false)
-      expect(Dir.empty?(KOTLIN_CODE_PATH)).to eq(false)
+      AndroidHelper.refactor_code_files(KOTLIN_CODE_PATH, RELEASE_PACKAGE_NAME, DEVELOP_PACKAGE_NAME)
       expect(File.exist?("#{KOTLIN_CODE_PATH}#{KOTLIN_FILENAME}")).to eq(true)
 
       package_name = FileHandling.get_package_name_from_kotlin_codefile("#{KOTLIN_CODE_PATH}/#{KOTLIN_FILENAME}")
-      expect(package_name).to eq(RELEASE_PACKAGE_NAME)
+      expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
     end
   end
 end

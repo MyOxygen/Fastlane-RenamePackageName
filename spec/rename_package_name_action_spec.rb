@@ -15,6 +15,8 @@ describe Fastlane::Actions::RenamePackageNameAction do
   ANDROID_PROJECT_PATH = "#{VALID_PATH_WITH_FILES}android_src/"
   private
   SOURCE_DIRECTORY = "#{ANDROID_PROJECT_PATH}app/src/"
+  private
+  PROFILES = ["debug", "main"]
 
   # Setup
   # Runs this before every test (`it`)
@@ -57,25 +59,13 @@ describe Fastlane::Actions::RenamePackageNameAction do
         )
       end
 
-      # Invalid programming language
-      INVALID_STRING_PARAMETERS.each do |invalid_parameter|
-        expect(Fastlane::UI).to receive(:user_error!)
-        Fastlane::Actions::RenamePackageNameAction.run(
-          new_package_name: VALID_PACKAGE_NAME,
-          platform: "android",
-          project_home_path: VALID_PATH,
-          language: invalid_parameter
-        )
-      end
-
       # Invalid profiles
       INVALID_STRING_PARAMETERS.each do |invalid_parameter|
         expect(Fastlane::UI).to receive(:user_error!)
         Fastlane::Actions::RenamePackageNameAction.run(
           new_package_name: VALID_PACKAGE_NAME,
           platform: "android",
-          project_home_path: VALID_PATH,
-          language: "kotlin"
+          project_home_path: VALID_PATH
         )
       end
     end
@@ -106,8 +96,6 @@ describe Fastlane::Actions::RenamePackageNameAction do
 
   context "Full Android package name change works correctly" do
     it "Modify package names for Kotlin project" do
-      profiles = ["debug/", "main/"]
-
       kotlin_code_path = "#{SOURCE_DIRECTORY}main/kotlin/com/example/app/"
       kotlin_filename = "MainActivity.kt"
 
@@ -115,8 +103,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
         project_home_path: ANDROID_PROJECT_PATH,
         new_package_name: DEVELOP_PACKAGE_NAME,
         platform: "android",
-        profiles: profiles,
-        language: "kotlin"
+        profiles: PROFILES
       )
 
       expect(Dir.exist?("#{kotlin_code_path}develop/")).to eq(true)
@@ -126,7 +113,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
 
       package_name = FileHandling.get_package_name_from_kotlin_codefile("#{kotlin_code_path}develop/#{kotlin_filename}")
       expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
-      profiles.each do |profile|
+      PROFILES.each do |profile|
         package_name = FileHandling.get_package_name_from_manifest(SOURCE_DIRECTORY + profile)
         expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
       end
@@ -135,8 +122,6 @@ describe Fastlane::Actions::RenamePackageNameAction do
     end
 
     it "Modify package names for Java project" do
-      profiles = ["debug/", "main/"]
-
       java_code_path = "#{SOURCE_DIRECTORY}main/java/com/example/app/"
       java_filename = "MainApplication.java"
 
@@ -144,8 +129,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
         project_home_path: ANDROID_PROJECT_PATH,
         new_package_name: DEVELOP_PACKAGE_NAME,
         platform: "android",
-        profiles: profiles,
-        language: "java"
+        profiles: PROFILES
       )
 
       expect(Dir.exist?("#{java_code_path}develop/")).to eq(true)
@@ -155,7 +139,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
 
       package_name = FileHandling.get_package_name_from_java_codefile("#{java_code_path}develop/#{java_filename}")
       expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
-      profiles.each do |profile|
+      PROFILES.each do |profile|
         package_name = FileHandling.get_package_name_from_manifest(SOURCE_DIRECTORY + profile)
         expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
       end
@@ -168,8 +152,7 @@ describe Fastlane::Actions::RenamePackageNameAction do
         project_home_path: ANDROID_PROJECT_PATH,
         new_package_name: DEVELOP_PACKAGE_NAME,
         platform: "android",
-        profiles: ["debug/", "main/"],
-        language: "java" # Doesn't really matter
+        profiles: PROFILES
       )
 
       package_name = FileHandling.get_package_name_from_appfile("#{ANDROID_PROJECT_PATH}fastlane/", FileHandling::APPFILE_ANDROID_ATTRIBUTE_REGEX)

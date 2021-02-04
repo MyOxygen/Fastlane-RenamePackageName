@@ -63,19 +63,18 @@ module Fastlane
           end
           FileHandling.update_matchfile(fastlane_directory, new_package_name)
         elsif platform == "android"
-          # For Android, we need the the profiles, and the language used.
+          # For Android, we need the the profiles.
           profiles = params[:profiles]
-          language = params[:language]
 
-          # The project home path is required, but the profiles and the
-          # language used are optional. These are defaulted.
+          # The project home path is required, but the profiles are optional.
+          # These are defaulted.
           if GenericHelper.is_nil_or_whitespace(project_home_path)
             UI.user_error!("The project home path must not be empty")
             return
           end
 
           # Required values are not empty, so we can carry out the renaming.
-          AndroidHelper.rename_package_names(project_home_path, new_package_name, profiles, language)
+          AndroidHelper.rename_package_names(project_home_path, new_package_name, profiles)
         else
           UI.user_error!("Platform not supported")
           return
@@ -136,12 +135,7 @@ module Fastlane
                                   env_name: "RENAME_PACKAGE_NAME_PROFILES",
                                 description: "The list of profiles necessary to run on (Android only), and takes an array of Strings",
                                   optional: true,
-                                      type: Array),
-          FastlaneCore::ConfigItem.new(key: :language,
-                                  env_name: "RENAME_PACKAGE_NAME_LANGUAGE",
-                                description: "The native language used to write the native code (Android only)",
-                                  optional: true,
-                                      type: String)
+                                      type: Array)
         ]
       end
 

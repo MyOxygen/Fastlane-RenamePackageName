@@ -18,26 +18,26 @@ class FileHandling
   # AndroidManifest
 
   def self.get_package_name_from_manifest(directory)
-    manifest_path = directory + MANIFEST_FILE
+    manifest_path = [directory, MANIFEST_FILE].join(File::SEPARATOR)
     package_name = get_package_name_from_file(manifest_path, MANIFEST_ATTRIBUTE_REGEX, MANIFEST_ATTRIBUTE_LENGTH)
     return package_name
   end
 
   def self.set_package_name_in_manifest(directory, old_package_name, new_package_name)
-    manifest_path = directory + MANIFEST_FILE
+    manifest_path = [directory, MANIFEST_FILE].join(File::SEPARATOR)
     set_package_name_in_file(manifest_path, old_package_name, new_package_name)
   end
 
   # gradle.build
 
   def self.get_package_name_from_gradle(directory)
-    gradle_path = directory + GRADLE_FILE
+    gradle_path = [directory, GRADLE_FILE].join(File::SEPARATOR)
     package_name = get_package_name_from_file(gradle_path, GRADLE_ATTRIBUTE_REGEX, GRADLE_ATTRIBUTE_LENGTH)
     return package_name
   end
 
   def self.set_package_name_in_gradle(directory, old_package_name, new_package_name)
-    gradle_path = directory + GRADLE_FILE
+    gradle_path = [directory, GRADLE_FILE].join(File::SEPARATOR)
     set_package_name_in_file(gradle_path, old_package_name, new_package_name)
   end
 
@@ -47,7 +47,7 @@ class FileHandling
     # The attribute is different between iOS and Android (even if it's the same
     # file). Therefore, the attribute regex must be specified when doing
     # opertations for Android and iOS.
-    appfile_path = directory + APP_FILE
+    appfile_path = [directory, APP_FILE].join(File::SEPARATOR)
     attribute_length = 0
     if attribute_regex == APPFILE_ANDROID_ATTRIBUTE_REGEX
       attribute_length = APPFILE_ANDROID_ATTRIBUTE_LENGTH
@@ -62,7 +62,7 @@ class FileHandling
   end
 
   def self.set_package_name_in_appfile(directory, old_package_name, new_package_name)
-    appfile_path = directory + APP_FILE
+    appfile_path = [directory, APP_FILE].join(File::SEPARATOR)
     set_package_name_in_file(appfile_path, old_package_name, new_package_name)
   end
 
@@ -78,13 +78,13 @@ class FileHandling
   # Matchfile
 
   def self.get_package_name_from_matchfile(directory)
-    matchfile_path = directory + MATCH_FILE
+    matchfile_path = [directory, MATCH_FILE].join(File::SEPARATOR)
     package_name = get_package_name_from_file(matchfile_path, MATCHFILE_ATTRIBUTE_REGEX, MATCHFILE_ATTRIBUTE_LENGTH)
     return package_name
   end
 
   def self.set_package_name_in_matchfile(directory, old_package_name, new_package_name)
-    matchfile_path = directory + MATCH_FILE
+    matchfile_path = [directory, MATCH_FILE].join(File::SEPARATOR)
     set_package_name_in_file(matchfile_path, old_package_name, new_package_name)
   end
 

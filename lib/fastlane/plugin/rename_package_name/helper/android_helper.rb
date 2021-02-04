@@ -2,17 +2,16 @@ require_relative "./file_handling.rb"
 require_relative "./generic_helper.rb"
 
 class AndroidHelper
-  def self.rename_package_names(project_home_path, new_package_name, profiles, language = "java")
+  LANGUAGES = ["java", "kotlin"]
+
+  def self.rename_package_names(project_home_path, new_package_name, profiles)
     # First check the parameters
     if GenericHelper.is_nil_or_whitespace(project_home_path)
       Fastlane::UI.user_error!("Invalid project home path: [#{project_home_path}]")
       return -1
     end
 
-    path = project_home_path
-    if !path.end_with?("/")
-      path += "/"
-    end
+    path = GenericHelper.append_directory_separator(project_home_path)
 
     gradle_directory = path + "app/"
     fastlane_directory = path + "fastlane/"
@@ -28,11 +27,6 @@ class AndroidHelper
       return -1
     end
 
-    if GenericHelper.is_nil_or_whitespace(language) || !(language.casecmp?("java") || language.casecmp?("kotlin"))
-      Fastlane::UI.user_error!("Invalid programming language: [#{language}]")
-      return -1
-    end
-
     # 1. Determine if we need to change the package name throughout the
     #    Android project.
     old_package_name = FileHandling.get_package_name_from_manifest(source_directory + profiles[0] + "/")
@@ -41,20 +35,16 @@ class AndroidHelper
     elsif old_package_name == new_package_name
       # If the package names are the same, there's no point in wasting time
       # conducting this operation. Warn the user, and exit early.
-      Fastlane::UI.important("The old package name in the AndroidManifest is the same as the desired new package name")
+      Fastlane::UI.important("The old package name in the AndroidManifest [#{old_package_name}] is the")
+      Fastlane::UI.important("same as the desired new package name [#{new_package_name}]")
       Fastlane::UI.important("Skipping package renaming")
       return -1
     end
-    status = update_manifests(source_directory, profiles, new_package_name)
-    if status == -1
-      return -1
-    end
 
-    # 2. Check if we need to move the necessary files into the new package-
-    #    name-driven folder structure, AND that the package reference is
-    #    updated in both Java and Kotlin code files.
-    # TODO: This doesn't seem to move the files if the new directory exists. Why?
-    move_code_files(source_directory, language, old_package_name, new_package_name)
+    # 2. If we get here, the new name differs from the old one, so we need to
+    #    go through every file in every sub-folder, and replace every instance
+    #    of the old package name with the new one.
+    migrate_project(source_directory, old_package_name, new_package_name)
 
     # 3. Check if the package name needs changing in the app/build.gradle file.
     status = update_gradle(gradle_directory, new_package_name)
@@ -69,32 +59,54 @@ class AndroidHelper
     end
   end
 
-  def self.update_manifests(source_directory, profiles, new_package_name)
-    # Convert the profile names into directories
-    profile_directories = []
-    profiles.each do |profile|
-      profile_directories.push(profile + "/")
-    end
+  def self.migrate_project(source_directory, old_package_name, new_package_name)
+    source_directory = GenericHelper.append_directory_separator(source_directory)
 
-    if !profiles.include?("main")
-      profile_directories.push("main/")
-    end
-
-    old_package_name = ""
-    profile_directories.each do |profile_directory|
-      # For each profile, update the package name in the manifest.
-      path = source_directory + profile_directory
-      old_package_name = FileHandling.get_package_name_from_manifest(path)
-      if old_package_name == -1
-        # An error went wrong. Pass it back up the calling tree
-        return -1
-      elsif old_package_name != new_package_name
-        # We need to updated the package name to the new package name.
-        if FileHandling.set_package_name_in_manifest(path, old_package_name, new_package_name) == -1
-          # Something went wrong. Pass it back up the calling tree.
-          return -1
-        end
+    Dir.entries(source_directory).each do |file_entity|
+      file_path = GenericHelper.append_directory_separator(source_directory + file_entity)
+      if file_entity == "." || file_entity == ".." || !File.exist?(file_path)
+        next
       end
+
+      # If it's not a directory, it's a file. Therefore, update the file with
+      # the new package name.
+      if !File.directory?(file_path)
+        # Update this file with the package reference to the new package name.
+        rename_package_in_code_file(file_path, old_package_name, new_package_name)
+        next
+      end
+
+      # If the folder is not a language folder (java/kotlin), then we need to
+      # dive into the folder to apply the renaming to the other files.
+      if !LANGUAGES.include?(file_entity)
+        # The folder is not the language directory. Dive deeper.
+        migrate_project(file_path, old_package_name, new_package_name)
+
+        # Once completed, move on to the next file/folder.
+        next
+      end
+
+      # We are going to handle things a bit differently if we are in a language
+      # directory. We want to move files first, then rename the package within.
+
+      # Navigate through the sub-folders and update the files in each folder.
+
+      code_directory_new = GenericHelper.append_directory_separator(file_path + new_package_name.gsub(".", "/"))
+      code_directory_old = GenericHelper.append_directory_separator(file_path + old_package_name.gsub(".", "/"))
+
+      # Check the assumed old directory actually exists
+      if !File.exist?(code_directory_old)
+        # The path is valid, but it is not the folder in which we need to
+        # migrate code in. Dive deeper, and modify the files within.
+        migrate_project(file_path, old_package_name, new_package_name)
+        next
+      end
+
+      # Move the files.
+      move_code_files(code_directory_old, code_directory_new)
+
+      # Replace any instances of the old package name with the new package name
+      refactor_code_files(code_directory_new, old_package_name, new_package_name)
     end
   end
 
@@ -111,32 +123,62 @@ class AndroidHelper
     return 0
   end
 
-  def self.move_code_files(source_directory, language, old_package_name, new_package_name)
-    code_path = source_directory + "main/" + language.downcase + "/"
-    code_directory_new = code_path + new_package_name.gsub(".", "/") + "/"
-    code_directory_old = code_path + old_package_name.gsub(".", "/") + "/" # Use the package name obtained from previous step
+  def self.move_code_files(old_directory, new_directory)
+    old_directory = GenericHelper.append_directory_separator(old_directory)
+    new_directory = GenericHelper.append_directory_separator(new_directory)
 
-    # Create the new folder if it doesn't already exist.
-    FileUtils.mkdir_p(code_directory_new)
-
-    # When moving files, assume the previous directory is that of the release
-    # package name structure.
-    Dir.entries(code_directory_old).each do |file|
-      file_path = code_directory_old + file
-      if file == "." || file == ".." || !File.exist?(file_path) || File.directory?(file_path)
+    Dir.entries(old_directory).each do |file_entity|
+      full_path = GenericHelper.append_directory_separator(old_directory + file_entity)
+      if file_entity == "." || file_entity == ".." || !File.exist?(full_path)
+        # Invalid file. Move on.
         next
       end
 
-      # TODO: Apply moving files to nested folders and code files.
+      # If the full path we need to move from is the same as the path we need
+      # to move to, don't do anything. Proceed to the next file/folder.
+      if File.identical?(new_directory, full_path)
+        next
+      end
+
+      # If the path is a folder, go in it to move the files.
+      if File.directory?(full_path)
+        # We want to maintain the folder structure, so append the `file_entity`
+        # to the new directory.
+        move_code_files(full_path, new_directory + file_entity)
+      else
+        # Create the destination folder if it does not exist.
+        FileUtils.mkdir_p(new_directory)
+
+        if !File.identical?(full_path, new_directory + file_entity)
+          FileUtils.mv(full_path, new_directory + file_entity, force: true)
+        end
+      end
+    end
+  end
+
+  def self.refactor_code_files(code_directory, old_package_name, new_package_name)
+    code_directory = GenericHelper.append_directory_separator(code_directory)
+
+    Dir.entries(code_directory).each do |file|
+      file_path = code_directory + file
+      if file == "." || file == ".." || !File.exist?(file_path)
+        next
+      end
+
+      # Check for nested directories.
+      if File.directory?(file_path)
+        # If the path is a directory, we need to refactor all the files within
+        # so that all instances of the old package name is replaced with the
+        # new package name.
+        refactor_code_files(file_path, old_package_name, new_package_name)
+
+        # Once the above has completed, we can continue to the next file or
+        # folder (if any are left).
+        next
+      end
 
       # Update the package reference to the new name
       rename_package_in_code_file(file_path, old_package_name, new_package_name)
-
-      # Only move files if their paths differ.
-      if !File.identical?(file_path, code_directory_new + file)
-        # Move files - https://ruby-doc.org/stdlib-2.4.1/libdoc/fileutils/rdoc/FileUtils.html#method-c-mv
-        FileUtils.mv(file_path, code_directory_new + file, force: true)
-      end
     end
   end
 

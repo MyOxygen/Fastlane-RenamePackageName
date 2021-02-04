@@ -19,7 +19,7 @@ class GenericHelper
     if File.exist?(directory) && !File.directory?(directory)
       return directory
     end
-    
+
     # File might not exist. Determine if the path is to a file or a folder.
     # `File.directory?()` returns false if the directory does not exist, even
     # if the path is a valid directory path. This is because files don't need
