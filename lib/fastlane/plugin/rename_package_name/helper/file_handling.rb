@@ -67,6 +67,11 @@ class FileHandling
   end
 
   def self.update_appfile(appfile_directory, attribute_regex, new_package_name)
+    # If the file does not exist, just return.
+    if !File.exist?([appfile_directory, APP_FILE].join(File::SEPARATOR))
+      return
+    end
+
     appfile_package_name = get_package_name_from_appfile(appfile_directory, attribute_regex)
     if appfile_package_name == -1
       return -1
@@ -89,6 +94,11 @@ class FileHandling
   end
 
   def self.update_matchfile(matchfile_directory, new_package_name)
+    # If the file does not exist, just return.
+    if !File.exist?([matchfile_directory, MATCH_FILE].join(File::SEPARATOR))
+      return
+    end
+    
     matchfile_package_name = get_package_name_from_matchfile(matchfile_directory)
     if matchfile_package_name != new_package_name
       set_package_name_in_matchfile(matchfile_directory, matchfile_package_name, new_package_name)
