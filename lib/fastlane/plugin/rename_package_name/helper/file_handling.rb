@@ -98,7 +98,7 @@ class FileHandling
     if !File.exist?([matchfile_directory, MATCH_FILE].join(File::SEPARATOR))
       return
     end
-    
+
     matchfile_package_name = get_package_name_from_matchfile(matchfile_directory)
     if matchfile_package_name != new_package_name
       set_package_name_in_matchfile(matchfile_directory, matchfile_package_name, new_package_name)
