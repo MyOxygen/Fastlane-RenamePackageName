@@ -1,0 +1,15 @@
+$production_package_name = "com.example.myapp"
+$development_package_name = $production_package_name + ".develop"
+$parent_directory = File.expand_path("..", Dir.pwd)
+
+lane :test do
+  # Change the package name output to change between
+  # development and production builds
+  rename_package_name(
+    project_home_path: $parent_directory,
+    new_package_name: $development_package_name,
+    # new_package_name: $production_package_name,
+    platform: "android",
+    profiles: ["main", "debug"]
+  )
+end
