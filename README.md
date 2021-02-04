@@ -1,10 +1,8 @@
 # rename_package_name plugin
 
-[![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-rename_package_name)
-
 ## Getting Started
 
-This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-rename_package_name`, add it to your project by running:
+This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin, designed by the team at MyOxygen. To get started with `fastlane-plugin-rename_package_name`, add it to your project by running:
 
 ```bash
 fastlane add_plugin rename_package_name
@@ -14,13 +12,16 @@ fastlane add_plugin rename_package_name
 
 A shorthand way of renaming the package name (App ID / Bundle ID) of an app in Fastlane.
 
-**Note to author:** Add a more detailed description about this plugin here. If your plugin contains multiple actions, make sure to mention them here.
+To prevent having to manually go through either the iOS and/or Android projects to reconfigure the project with a new package name, this script does it all for you. On iOS is uses the pre-existing [`update_app_identifier`](https://docs.fastlane.tools/actions/update_app_identifier/) provided by Fastlane. For Android, a custom script is implemented that runs through all the project, and updates both the project files and the folder structure.
 
 ## Example
 
-Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin. Try it by cloning the repo, running `fastlane install_plugins` and `bundle exec fastlane test`.
+Check out the [example `Fastfile`](example/fastlane/Fastfile) to see how to use this plugin. To test it out:
+1. Clone the repo, and in a console run `fastlane install_plugins`.
+2. Navigate to the `example` folder.
+3. Run `bundle exec fastlane test`.
 
-**Note to author:** Please set up a sample project to make it easy for users to explore what your plugin does. Provide everything that is necessary to try out the plugin in this project (including a sample Xcode/Android project if necessary)
+You can change the package name to whatever is needed. The example shows changing between a development package name and a production package name.
 
 ## Run tests for this plugin
 
