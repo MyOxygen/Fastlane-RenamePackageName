@@ -94,18 +94,6 @@ describe IosHelper do
       package_name = FileHandling.get_package_name_from_xcode_project_file(SpecHelper::PBXPROJ_PATH)
       expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
     end
-
-    it "Info.plist" do
-      IosHelper.rename_package_names(
-        SpecHelper::IOS_PROJECT_PATH,
-        SpecHelper::DEVELOP_PACKAGE_NAME,
-        SpecHelper::PBXPROJ_DEST_PATH,
-        SpecHelper::INFO_PLIST_PATH
-      )
-
-      package_name = FileHandling.get_package_name_from_info_plist(SpecHelper::INFO_PLIST_PATH)
-      expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
-    end
   end
 end
   
