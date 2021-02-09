@@ -35,7 +35,7 @@ platform :android do
       # 4. Search for accepted values in parameter value (return `nil` if none found).
       # 5. Assign `true` if found (not `nil`), otherwise `false`
     if !use_dev.nil? && !(use_dev.to_s.strip.downcase =~ /^(true|t|yes|y|1)$/i).nil?
-      new_package_name = $production_package_name
+      new_package_name = $development_package_name
     end
 
     # Change the package name output to change between
