@@ -12,15 +12,25 @@ module SpecHelper
   RELEASE_PACKAGE_NAME = "com.example.app"
   DEVELOP_PACKAGE_NAME = "com.example.app.develop"
   VALID_PATH_WITH_FILES = "./spec/test_files/"
+
+  # Android
   ANDROID_PROJECT_PATH = "#{VALID_PATH_WITH_FILES}android_src/"
-  IOS_PROJECT_PATH = "#{VALID_PATH_WITH_FILES}ios_src/"
   FASTLANE_ANDROID_DIRECTORY = "#{ANDROID_PROJECT_PATH}fastlane/"
-  FASTLANE_IOS_DIRECTORY = "#{IOS_PROJECT_PATH}fastlane/"
   SOURCE_DIRECTORY = "#{ANDROID_PROJECT_PATH}app/src/"
   JAVA_CODE_PATH = "#{SOURCE_DIRECTORY}main/java/com/example/app/"
   KOTLIN_CODE_PATH = "#{SOURCE_DIRECTORY}main/kotlin/com/example/app/"
   JAVA_FILENAME = "MainApplication.java"
   KOTLIN_FILENAME = "MainActivity.kt"
+
+  # iOS
+  PBXPROJ = "project.pbxproj"
+  INFO_PLIST = "Info.plist"
+  IOS_PROJECT_PATH = "#{VALID_PATH_WITH_FILES}ios_src/"
+  FASTLANE_IOS_DIRECTORY = "#{IOS_PROJECT_PATH}fastlane/"
+  PBXPROJ_DEST_PATH = "#{IOS_PROJECT_PATH}Runner.xcodeproj/"
+  INFO_PLIST_DEST_PATH = "#{IOS_PROJECT_PATH}Runner/"
+  PBXPROJ_PATH = "#{PBXPROJ_DEST_PATH}#{PBXPROJ}"
+  INFO_PLIST_PATH = "#{INFO_PLIST_DEST_PATH}#{INFO_PLIST}"
 
   def self.reset_testing_conditions
     # AndroidManifest
@@ -60,6 +70,18 @@ module SpecHelper
     FileUtils.cp_r(
       STATIC_FILES + JAVA_FILENAME,
       JAVA_CODE_PATH,
+      remove_destination: true
+    )
+
+    # iOS project files
+    FileUtils.cp_r(
+      STATIC_FILES + PBXPROJ,
+      PBXPROJ_PATH,
+      remove_destination: true
+    )
+    FileUtils.cp_r(
+      STATIC_FILES + INFO_PLIST,
+      INFO_PLIST_PATH,
       remove_destination: true
     )
 

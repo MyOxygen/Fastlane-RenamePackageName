@@ -119,6 +119,51 @@ class FileHandling
     return package_name
   end
 
+  # Xcode Project file
+
+  def self.get_package_name_from_xcode_project_file(pbxproj_path)
+    package_name = get_package_name_from_file(pbxproj_path, /PRODUCT_BUNDLE_IDENTIFIER = /, 28, ";")
+    return package_name
+  end
+
+  # Info.plist file
+
+  # The process of getting the package name from the Info.plist file differs a
+  # bit, in that the attribute spans over two lines. To find the attribute, we
+  # need to read the whole file, rather than line by line.
+  def self.get_package_name_from_info_plist(info_plist_file)
+    # Check file exists
+    if !File.exist?(info_plist_file)
+      Fastlane::UI.user_error!("The provided path [#{info_plist_file}] does not exist")
+      return -1
+    end
+
+    package_name = ""
+
+    # Read/write file - https://www.rubyguides.com/2015/05/working-with-files-ruby/#How_to_Read_Files_In_Ruby
+    info_plist_contents = File.open(info_plist_file).read
+    contents_split = info_plist_contents.split(/<key>CFBundleIdentifier<\/key>\s*<string>/)
+    if contents_split.length == 1
+      Fastlane::UI.user_error!("No package name attribute could be found in [#{info_plist_file}]")
+      return -1
+    end
+
+    # On a successful split, we will need the second item in the list, as this
+    # will contain the package name.
+    contents_with_package_name = contents_split[1]
+
+    # Split again, and get the first item in the list.
+    contents_split_again = contents_with_package_name.split("</string>")
+    if contents_split_again.length == 1
+      Fastlane::UI.user_error!("No package name attribute could be retrieved in [#{info_plist_file}]")
+      return -1
+    end
+
+    package_name = contents_split_again[0]
+
+    return package_name
+  end
+
   # Generic
 
   def self.get_package_name_from_file(file_path, attribute_regex, attribute_regex_length, attribute_end_char = "\"")

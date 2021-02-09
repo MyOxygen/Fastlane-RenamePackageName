@@ -33,9 +33,7 @@ module Fastlane
 
         platform = platform.downcase
         if platform == "ios"
-          # For iOS, we need the xcodeproj and plist_path. We will be using
-          # the existing package provided by Fastlane: `update_app_identifier`
-          # (https://docs.fastlane.tools/actions/update_app_identifier/).
+          # For iOS, we need the xcodeproj and plist_path.
 
           xcodeproj = params[:xcodeproj]
           plist_path = params[:plist_path]
@@ -48,24 +46,9 @@ module Fastlane
             UI.user_error!("The Info.plist path must not be empty")
             return
           end
-
+          
           # Required values are not empty, so we can carry out the renaming.
-          # When calling an external action, use the action's class name.
-          # Class name - https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/update_app_identifier.rb
-          # Suggestion from - https://github.com/fastlane/fastlane/issues/826
-          Fastlane::Actions::UpdateAppIdentifierAction.run(
-            xcodeproj: xcodeproj,
-            plist_path: plist_path,
-            app_identifier: new_package_name
-          )
-
-          # Update Fastlane-releated files (Matchfile is specific to iOS)
-          fastlane_directory = GenericHelper.append_directory_separator(project_home_path) + "fastlane/"
-          status = FileHandling.update_appfile(fastlane_directory, FileHandling::APPFILE_IOS_ATTRIBUTE_REGEX, new_package_name)
-          if status == -1
-            return
-          end
-          FileHandling.update_matchfile(fastlane_directory, new_package_name)
+          IosHelper.rename_package_names(project_home_path, new_package_name, xcodeproj, plist_path)
         elsif platform == "android"
           # For Android, we need the the profiles.
           profiles = params[:profiles]
