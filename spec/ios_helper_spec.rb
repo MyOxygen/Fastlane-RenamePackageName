@@ -12,6 +12,9 @@ describe IosHelper do
   private
   VALID_PACKAGE_NAME = SpecHelper::RELEASE_PACKAGE_NAME
 
+  private
+  INFO_PLIST_PATH_RELATIVE_TO_XCODEPROJ = "Runner/Info.plist"
+
   # Setup
   # Runs this before every test (`it`)
   before(:each) do
@@ -27,7 +30,7 @@ describe IosHelper do
           invalid_path,
           SpecHelper::RELEASE_PACKAGE_NAME,
           VALID_PATH_NO_FILES,
-          VALID_PATH_NO_FILES,
+          VALID_PATH_NO_FILES
         )
       end
     end
@@ -84,16 +87,45 @@ describe IosHelper do
 
   context "Files refactored successfully" do
     it "PBXPROJ" do
-      IosHelper.rename_package_names(
+      expect(Fastlane::UI).not_to receive(:user_error!)
+      status = IosHelper.rename_package_names(
         SpecHelper::IOS_PROJECT_PATH,
         SpecHelper::DEVELOP_PACKAGE_NAME,
         SpecHelper::PBXPROJ_DEST_PATH,
-        SpecHelper::INFO_PLIST_PATH
+        INFO_PLIST_PATH_RELATIVE_TO_XCODEPROJ
       )
+      expect(status).not_to eq(-1)
 
       package_name = FileHandling.get_package_name_from_xcode_project_file(SpecHelper::PBXPROJ_PATH)
       expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
     end
+
+    it "Appfile" do
+      expect(Fastlane::UI).not_to receive(:user_error!)
+      status = IosHelper.rename_package_names(
+        SpecHelper::IOS_PROJECT_PATH,
+        SpecHelper::DEVELOP_PACKAGE_NAME,
+        SpecHelper::PBXPROJ_DEST_PATH,
+        INFO_PLIST_PATH_RELATIVE_TO_XCODEPROJ
+      )
+      expect(status).not_to eq(-1)
+
+      package_name = FileHandling.get_package_name_from_appfile(SpecHelper::FASTLANE_IOS_DIRECTORY, FileHandling::APPFILE_IOS_ATTRIBUTE_REGEX)
+      expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
+    end
+
+    it "Matchfile" do
+      expect(Fastlane::UI).not_to receive(:user_error!)
+      status = IosHelper.rename_package_names(
+        SpecHelper::IOS_PROJECT_PATH,
+        SpecHelper::DEVELOP_PACKAGE_NAME,
+        SpecHelper::PBXPROJ_DEST_PATH,
+        INFO_PLIST_PATH_RELATIVE_TO_XCODEPROJ
+      )
+      expect(status).not_to eq(-1)
+
+      package_name = FileHandling.get_package_name_from_matchfile(SpecHelper::FASTLANE_IOS_DIRECTORY)
+      expect(package_name).to eq(DEVELOP_PACKAGE_NAME)
+    end
   end
 end
-  

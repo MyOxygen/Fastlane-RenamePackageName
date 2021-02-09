@@ -46,7 +46,7 @@ module Fastlane
             UI.user_error!("The Info.plist path must not be empty")
             return
           end
-          
+
           # Required values are not empty, so we can carry out the renaming.
           IosHelper.rename_package_names(project_home_path, new_package_name, xcodeproj, plist_path)
         elsif platform == "android"
