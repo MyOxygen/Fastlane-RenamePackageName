@@ -20,7 +20,10 @@ module Fastlane
         new_package_name = params[:new_package_name]
         project_home_path = params[:project_home_path]
 
-        if GenericHelper.is_nil_or_whitespace(new_package_name)
+        if GenericHelper.is_nil_or_whitespace(project_home_path)
+          UI.user_error!("The project home path must not be empty")
+          return
+        elsif GenericHelper.is_nil_or_whitespace(new_package_name)
           UI.user_error!("The new package name must not be empty")
           return
         elsif GenericHelper.is_nil_or_whitespace(platform)
@@ -57,6 +60,7 @@ module Fastlane
           )
 
           # Update Fastlane-releated files (Matchfile is specific to iOS)
+          fastlane_directory = GenericHelper.append_directory_separator(project_home_path) + "fastlane/"
           status = FileHandling.update_appfile(fastlane_directory, FileHandling::APPFILE_IOS_ATTRIBUTE_REGEX, new_package_name)
           if status == -1
             return
@@ -66,12 +70,7 @@ module Fastlane
           # For Android, we need the the profiles.
           profiles = params[:profiles]
 
-          # The project home path is required, but the profiles are optional.
-          # These are defaulted.
-          if GenericHelper.is_nil_or_whitespace(project_home_path)
-            UI.user_error!("The project home path must not be empty")
-            return
-          end
+          # The profiles are optional and defaulted.
 
           # Required values are not empty, so we can carry out the renaming.
           AndroidHelper.rename_package_names(project_home_path, new_package_name, profiles)
