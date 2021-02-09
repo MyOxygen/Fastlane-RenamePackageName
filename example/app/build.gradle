@@ -1,6 +1,0 @@
-// THIS IS A TEST GRADLE FILE
-android {
-    defaultConfig {
-        applicationId "com.example.myapp"
-    }
-}

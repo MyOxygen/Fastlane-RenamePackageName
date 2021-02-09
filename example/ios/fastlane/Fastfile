@@ -1,0 +1,54 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+$production_package_name = "com.example.exampleapp"
+$development_package_name = $production_package_name + ".develop"
+$parent_directory = File.expand_path("..", Dir.pwd)
+$xcodeproj = $parent_directory + "/Runner.xcodeproj"
+$plist_relative_path = "Runner/Info.plist" # Path must be relative to the xcodeproj
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Test switching package names"
+  lane :test do |options|
+    new_package_name = $production_package_name
+    use_dev = options[:use_dev]
+      # Command line parameters are usually passed as Strings. Use a RegEx to
+      # determine if the user has anabled "force". Allowed values:
+      # true, t, yes, y, 1
+      # The expression below essentially translates to:
+      # 1. Convert the value to string (sometimes, the parameter is not a
+      #    string, but we need a string).
+      # 2. Remove trailing and leading whitespace from parameter value.
+      # 3. Convert parameter value to lower case.
+      # 4. Search for accepted values in parameter value (return `nil` if none found).
+      # 5. Assign `true` if found (not `nil`), otherwise `false`
+    if !use_dev.nil? && !(use_dev.to_s.strip.downcase =~ /^(true|t|yes|y|1)$/i).nil?
+      new_package_name = $production_package_name
+    end
+
+    # Change the package name output to change between
+    # development and production builds
+    rename_package_name(
+      project_home_path: $parent_directory,
+      new_package_name: new_package_name,
+      platform: "android",
+      profiles: ["main", "debug", "profile"]
+    )
+
+    # Do any additional stuff.
+  end
+end
