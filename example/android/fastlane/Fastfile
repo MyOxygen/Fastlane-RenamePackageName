@@ -13,7 +13,7 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
-$production_package_name = "com.example.exampleapp"
+$production_package_name = "com.example.example_app"
 $development_package_name = $production_package_name + ".develop"
 $parent_directory = File.expand_path("..", Dir.pwd)
 

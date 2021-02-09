@@ -13,7 +13,7 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
-$production_package_name = "com.example.exampleapp"
+$production_package_name = "com.example.example_app"
 $development_package_name = $production_package_name + ".develop"
 $parent_directory = File.expand_path("..", Dir.pwd)
 $xcodeproj = $parent_directory + "/Runner.xcodeproj"
@@ -43,10 +43,11 @@ platform :ios do
     # Change the package name output to change between
     # development and production builds
     rename_package_name(
-      project_home_path: $parent_directory,
-      new_package_name: new_package_name,
-      platform: "android",
-      profiles: ["main", "debug", "profile"]
+      platform: "ios",
+      project_home_path: $parent_directory, 
+      new_package_name: $development_package_name,
+      xcodeproj: $xcodeproj, 
+      plist_path: $plist_relative_path
     )
 
     # Do any additional stuff.
