@@ -1,4 +1,7 @@
 ---
+AllCops:
+  Exclude:
+  - "./example/**/*"
 Style/MultipleComparison:
   Enabled: false
 Style/PercentLiteralDelimiters:
@@ -166,27 +169,31 @@ Lint/IsStringUsage:
 Style/MethodCallWithArgsParentheses:
   Enabled: true
   IgnoredMethods:
-  - require
-  - require_relative
-  - fastlane_require
-  - gem
-  - program
-  - command
-  - raise
+  - after
   - attr_accessor
   - attr_reader
-  - desc
-  - lane
-  - private_lane
-  - platform
-  - to
-  - not_to
-  - describe
-  - it
   - be
-  - context
   - before
-  - after
+  - command
+  - context
+  - desc
+  - describe
+  - require
+  - fastlane_require
+  - flutter_install_all_ios_pods
+  - gem
+  - lane
+  - it
+  - not_to
+  - platform
+  - private_lane
+  - program
+  - project
+  - raise
+  - require_relative
+  - source
+  - target
+  - to
 Style/NegatedIf:
   Enabled: true
   EnforcedStyle: postfix

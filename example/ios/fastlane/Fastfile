@@ -26,16 +26,16 @@ platform :ios do
   lane :test do |options|
     new_package_name = $production_package_name
     use_dev = options[:use_dev]
-      # Command line parameters are usually passed as Strings. Use a RegEx to
-      # determine if the user has anabled "force". Allowed values:
-      # true, t, yes, y, 1
-      # The expression below essentially translates to:
-      # 1. Convert the value to string (sometimes, the parameter is not a
-      #    string, but we need a string).
-      # 2. Remove trailing and leading whitespace from parameter value.
-      # 3. Convert parameter value to lower case.
-      # 4. Search for accepted values in parameter value (return `nil` if none found).
-      # 5. Assign `true` if found (not `nil`), otherwise `false`
+    # Command line parameters are usually passed as Strings. Use a RegEx to
+    # determine if the user has anabled "force". Allowed values:
+    # true, t, yes, y, 1
+    # The expression below essentially translates to:
+    # 1. Convert the value to string (sometimes, the parameter is not a
+    #    string, but we need a string).
+    # 2. Remove trailing and leading whitespace from parameter value.
+    # 3. Convert parameter value to lower case.
+    # 4. Search for accepted values in parameter value (return `nil` if none found).
+    # 5. Assign `true` if found (not `nil`), otherwise `false`
     if !use_dev.nil? && !(use_dev.to_s.strip.downcase =~ /^(true|t|yes|y|1)$/i).nil?
       new_package_name = $development_package_name
     end
@@ -44,9 +44,9 @@ platform :ios do
     # development and production builds
     rename_package_name(
       platform: "ios",
-      project_home_path: $parent_directory, 
-      new_package_name: $development_package_name,
-      xcodeproj: $xcodeproj, 
+      project_home_path: $parent_directory,
+      new_package_name: new_package_name,
+      xcodeproj: $xcodeproj,
       plist_path: $plist_relative_path
     )
 
