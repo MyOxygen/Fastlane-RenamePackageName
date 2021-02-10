@@ -1,4 +1,4 @@
 source "https://rubygems.org"
 
 gem "fastlane"
-gem 'fastlane-plugin-rename_package_name', path: '/Users/thomasbartleet/GitHub/Fastlane-RenamePackageName'
+gem 'fastlane-plugin-rename_package_name', path: '../../'
