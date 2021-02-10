@@ -20,22 +20,12 @@ $parent_directory = File.expand_path("..", Dir.pwd)
 default_platform(:android)
 
 platform :android do
-  desc "Test switching package names"
-  lane :test do |options|
-    new_package_name = $production_package_name
-    use_dev = options[:use_dev]
-    # Command line parameters are usually passed as Strings. Use a RegEx to
-    # determine if the user has anabled "force". Allowed values:
-    # true, t, yes, y, 1
-    # The expression below essentially translates to:
-    # 1. Convert the value to string (sometimes, the parameter is not a
-    #    string, but we need a string).
-    # 2. Remove trailing and leading whitespace from parameter value.
-    # 3. Convert parameter value to lower case.
-    # 4. Search for accepted values in parameter value (return `nil` if none found).
-    # 5. Assign `true` if found (not `nil`), otherwise `false`
-    if !use_dev.nil? && !(use_dev.to_s.strip.downcase =~ /^(true|t|yes|y|1)$/i).nil?
-      new_package_name = $development_package_name
+  desc "Change the package name of the project"
+  lane :change_package_name do |options|
+    
+    new_package_name = options[:new_package_name]
+    if new_package_name.nil? || new_package_name.to_s.empty?
+      new_package_name = $production_package_name
     end
 
     # Change the package name output to change between

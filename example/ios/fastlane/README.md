@@ -16,11 +16,11 @@ or alternatively using `brew install fastlane`
 
 # Available Actions
 ## iOS
-### ios test
+### ios change_package_name
 ```
-fastlane ios test
+fastlane ios change_package_name
 ```
-Test switching package names
+Change the package name of the project
 
 ----
 

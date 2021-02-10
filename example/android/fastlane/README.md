@@ -16,11 +16,11 @@ or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
-### android test
+### android change_package_name
 ```
-fastlane android test
+fastlane android change_package_name
 ```
-Test switching package names
+Change the package name of the project
 
 ----
 
